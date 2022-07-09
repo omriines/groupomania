@@ -1,0 +1,24 @@
+let models = require('../models');
+
+module.exports = {
+  
+    isAdmin: function (value) {
+        models.User.findOne({id: value})
+        .then((user)=>{
+            if(!User){
+                res.status(404).json({ message : "Utilisateur introuvable !" });
+            }
+            else{
+                
+                if(models.User.){
+                   return true;
+                }
+                else {
+                 return false;
+            }
+        }
+
+
+        })
+    }
+}
