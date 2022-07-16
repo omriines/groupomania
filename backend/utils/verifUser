@@ -10,7 +10,7 @@ module.exports = {
             }
             else{
                 
-                if(models.User.){
+                if(!User){
                    return true;
                 }
                 else {
