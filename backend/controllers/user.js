@@ -7,7 +7,7 @@ const verifUser = require('../utils/verifUser')
 const { encrypt, decrypt } = require('../utils/emailCrypto');
 
 //Création d'un user
-exports.signup = (req, res) => {
+exports.signup = (req, res, next) => {
 
   console.log(req.body.password);
     const emailCryptoJs = encrypt(req.body.email);
@@ -33,18 +33,19 @@ exports.signup = (req, res) => {
 
 
 //Login d'un user
-exports.signin = (req, res) => {
+exports.signin = (req, res, next) => {
    
     const emailCryptoJs = encrypt(req.body.email);
-    User.findOne({ email: emailCryptoJs })
+    console.log(req.body.email+"ssssss");
+    User.findOne({where:{ email: emailCryptoJs }})
       .then(user => {
         if (!user) {
-          return res.status(401).json({ message: 'Utilisateur non trouvé !' });
+          return res.status(404).json({ message: 'Utilisateur non trouvé !' });
         }
         bcrypt.compare(req.body.password, user.password)
           .then(valid => {
             if (!valid) {
-              return res.status(401).json({ message: 'Mot de passe incorrect !' });
+              return res.status(400).json({ message: 'Mot de passe incorrect !' });
             }
             console.log("********************");
              console.log(req.body.email)
@@ -53,9 +54,8 @@ exports.signin = (req, res) => {
               email: decrypt(user.email),
                //Encoder un nouveau token
                token :jwt.sign(
-                { userId: user.id},
-                "" + process.env.JWT_KEY,
-               // process.env.JWT_TOKEN_KEY,
+                { userId: user.id, isAdmin: user.admin},
+                process.env.JWT_TOKEN_KEY,
                 { expiresIn: '24h' }
               )
             
@@ -68,26 +68,27 @@ exports.signin = (req, res) => {
 }
 
 //Profil d'un user
-exports.userProfil = (req, res) => {
+exports.userProfil = (req, res, next) => {
 
-    const emailCryptoJs = encrypt(req.body.email);
-    User.findOne({ email: emailCryptoJs })
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
+  const userId = decodedToken.userId;
+  const isAdmin = decodedToken.isAdmin;
+ 
+
+   
+    User.findOne({where:{id: userId}})
       .then(user => {
         if (!user) {
-          return res.status(401).json({ message: 'Utilisateur non trouvé !' });
+          return res.status(404).json({ message: 'Utilisateur non trouvé !' });
         }
-        bcrypt.compare(req.body.password, user.password)
-          .then(valid => {
-            if (!valid) {
-              return res.status(401).json({ message: 'Mot de passe incorrect !' });
-            }
-            res.status(200).json({
-              userId: user._id,
-              email: decrypt(user.email),
-              nom :user.name
-            });
-          })
-          .catch(error => res.status(500).json({ message : error.message }));
+        
+        res.status(200).json({
+          userId: user.id,
+          email: decrypt(user.email),
+          
+        
+        });
       })
       .catch(error => res.status(500).json({ message : error.message }));
 
@@ -95,63 +96,72 @@ exports.userProfil = (req, res) => {
 };
 
 //modification d'un user
-exports.modifyUser = (req, res) => {
+exports.modifyUser = (req, res, next) => {
 
- const emailCryptoJs = encrypt(req.body.email);
-    User.findOne({ email: emailCryptoJs })
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
+  const userId = decodedToken.userId;
+  const isAdmin = decodedToken.isAdmin;
+ 
+    User.findOne({where:{id: req.body.id}})
     .then((user) => {
-        if(!User){
+        if(!user){
             res.status(404).json({ message : "Utilisateur introuvable !" });
         }
         else{
-            const token = req.headers.authorization.split(' ')[1];
-            const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-            const userId = decodedToken.userId;
-            if(user.userId !== userId){
-                res.status(403).json({ message : "Action non autorisée !" })
-            }
-            else {
-                User.update(
-                    {
-                    name: req.body.username,
-                    email: req.body.email,
-                    password: req.body.description,
-                    }
-                )
+          console.log("******: user trouvé");
+          if(user.id=userId || isAdmin){
+                console.log("******: "+req.body.id);
+                console.log("+++++++: "+req.body.name);
+                User.update({name: req.body.name},{
+                  where: {
+                    id: req.body.id
+                  }
+                })
                     .then(() => res.status(200).json({ message: "Compte mis à jour !" }))
                     .catch((error) => res.status(400).json({ error }));
                 }   
+            
+            else {
+              res.status(403).json({ message : "Action non autorisée !" })
                 }
-                })
-
+                
+              }})
              .catch((error) => res.status(500).json({ error }));
 };
 
 
 //Suppression d'un user
-exports.deleteUser = (req, res) => {
-    User.findOne({id: req.params.id})
+exports.deleteUser = (req, res, next) => {
+  console.log("+++++++++++"+req.body.id);
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
+  const userId = decodedToken.userId;
+  const isAdmin = decodedToken.isAdmin;
+ 
+  User.findOne({where:{id: req.body.id}})
         .then((user) => {
 
-            if(!User){
+            if(!user){
                 res.status(404).json({ message : "Utilisateur introuvable !" });
             }
             else{
-                const token = req.headers.authorization.split(' ')[1];
-                const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
-                const userId = decodedToken.userId;
-                if(!(verifUser.isAdmin(userId))){
-                    res.status(403).json({ message : "Action non autorisée !" })
+              console.log(user.id+"/"+userId+"/"+isAdmin);
+              console.log(((user.id!=userId)));
+              console.log((!isAdmin));
+               if((user.id=userId) || (isAdmin)){
+                User.destroy({where:{id: req.body.id }});
+                res.status(200).json({ message: "Compte supprimé !" }); 
+                   
                 }
                 else {
-         
-            User.deleteOne({ id: req.params.id });
-            res.status(200).json({ message: "Compte supprimé !" }); 
+                  res.status(403).json({ message : "Action non autorisée !" })
+             
 
             }
         }
         })
     
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message:error.message }));
     };
 

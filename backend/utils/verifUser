@@ -5,18 +5,13 @@ module.exports = {
     isAdmin: function (value) {
         models.User.findOne({id: value})
         .then((user)=>{
-            if(!User){
-                res.status(404).json({ message : "Utilisateur introuvable !" });
+    
+            if (!user.isAdmin){
+                return false;
             }
-            else{
-                
-                if(!User){
-                   return true;
-                }
-                else {
-                 return false;
+            else if(user.isAdmin){
+                return true;
             }
-        }
 
 
         })

@@ -1,7 +1,11 @@
+//Importation de variable d'environnement
+require('dotenv').config();
 //Import
 const express = require('express');
 const bodyParser = require('body-parser');
-const userRoutes = require('./routes/user.js');
+const userRoutes = require('./routes/user');
+const postRoutes = require('./routes/post');
+
 const path = require('path');
 
 
@@ -25,7 +29,7 @@ app.use(bodyParser.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use('/api/user', userRoutes);
-
+app.use('/api/post', postRoutes);
 
 
 module.exports = app;
