@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const models = require('../models');
 const Post = models.Post;
+const User = models.User;
 const { encrypt, decrypt } = require('../utils/emailCrypto');
 
 exports.create = (req, res, next) => {
@@ -28,3 +29,54 @@ console.log("message:"+postObject.message);
      })
 
     };
+
+exports.getAll = (req, res, next) => {
+    console.log("entré dans API");
+    Post.findAll({
+        attributes: [
+          "id",
+          "message",
+          "image",
+          "createdAt",
+          "updatedAt",
+          "UserId",
+        ],
+    
+        order: [["createdAt", "DESC"]],
+    
+        include: [
+          {
+            model: User,
+            attributes: ["name", "id"],
+          },
+        ],
+      })
+      .then((Posts) => res.status(201).json({Posts}))
+      .catch(error => {
+        console.log(error);
+        res.status(400).json({ message : error.message }); 
+       
+      })
+     
+    };
+exports.update = async (req, res, next) => {
+        console.log(req.body.id);
+        Post.findOne({
+          where: {
+            id: req.body.id,
+          },
+        })
+          .then(() => {
+            Post.update(
+              {
+                message: req.body.message,
+              },
+              {
+                where: { id: req.body.id },
+              }
+            )
+              .then(() => res.status(200).json({ message: "Post mis à jour !" }))
+              .catch((error) => res.status(400).json({ error }));
+          })
+          .catch((error) => res.status(500).json({ error }));
+};

@@ -1,5 +1,5 @@
 import  '../styles/Signup.css'
-
+import {Link} from "react-router-dom"
 function Signin() {
     return (
         <form class="form-login">
@@ -11,7 +11,7 @@ function Signin() {
                     <input type="email" class="input" placeholder="Email" />
                     <input type="password" class="input" placeholder="Password" />
                 </div>
-                <button class="submit-btn">SignUp</button>
+                <button class="submit-btn"><Link to='/post'>SignUp</Link></button>
                 
             </div>
         </div>

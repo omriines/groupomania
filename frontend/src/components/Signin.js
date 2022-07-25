@@ -1,7 +1,13 @@
 import  '../styles/Signin.css'
 import Signup from './Signup'
-import {useEffect} from "react";
+import {Link} from "react-router-dom";
+import React, { useEffect, useState } from 'react';
 function Signin() {
+    useEffect(() => {
+        fetch('http://localhost:3000/api/user/signin')
+          .then((response) => console.log(response.json()))
+       
+      }, []);
     return (
         <form class="form-login">
         <div class="login">
@@ -11,8 +17,8 @@ function Signin() {
                     <input type="email" class="input" placeholder="Email" />
                     <input type="password" class="input" placeholder="Password" />
                 </div>
-                <button class="submit-btn">SignIn</button>
-                <a href="#">SignUp</a>
+                <button class="submit-btn"><Link to='/post'>SignIn</Link></button>
+                <Link to='/signup'>SignUp</Link>
             </div>
         </div>
     </form>
