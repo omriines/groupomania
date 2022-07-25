@@ -8,6 +8,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer.index";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Posts from "./pages/Posts";
+import Signin from "./pages/Signin";
+import Signup from "./pages/signup";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const GlobalStyle = createGlobalStyle`
@@ -27,6 +29,8 @@ root.render(
           <Routes>
             <Route path="/" exact element={<Home />} />
             <Route path="/posts" exact element={<Posts />} />
+            <Route path="/signin" exact element={<Signin />} />
+            <Route path="/signup" exact element={<Signup />} />
           </Routes>
           <Footer />
       </Router>
