@@ -2,8 +2,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const models = require('../models');
+const sequelize= require('sequelize');
 const Post = models.Post;
 const User = models.User;
+const Like = models.Like;
 const { encrypt, decrypt } = require('../utils/emailCrypto');
 const fs = require("fs");
 
@@ -44,18 +46,22 @@ exports.getAll = (req, res, next) => {
         ],
     
         order: [["createdAt", "DESC"]],
+        group:["id"],
     
         include: [
           {
+            model : Like,
+            attributes: [ [sequelize.fn('COUNT', sequelize.col('likes.id')), 'count'],
+        ]
+          },
+          {
             model: User,
             attributes: ["name", "id"],
-          },
-        {
-        model:Like,
-        attributes: ["PostId", "UserId"],
-        }
-          
+          }
+         
         ],
+       
+      
       })
       .then((Posts) => res.status(201).json({Posts}))
       .catch(error => {
