@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const models = require('../models');
 const User = models.User;
-const verifUser = require('../utils/verifUser')
 const { encrypt, decrypt } = require('../utils/emailCrypto');
 
 //Création d'un user
@@ -74,9 +73,7 @@ exports.userProfil = (req, res, next) => {
   const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
   const userId = decodedToken.userId;
   const isAdmin = decodedToken.isAdmin;
- 
-
-   
+  console.log(userId);
     User.findOne({where:{id: userId}})
       .then(user => {
         if (!user) {
@@ -86,6 +83,7 @@ exports.userProfil = (req, res, next) => {
         res.status(200).json({
           userId: user.id,
           email: decrypt(user.email),
+          image:user.image,
           
         
         });
@@ -102,8 +100,8 @@ exports.modifyUser = (req, res, next) => {
   const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
   const userId = decodedToken.userId;
   const isAdmin = decodedToken.isAdmin;
- 
-    User.findOne({where:{id: req.body.id}})
+  const userObject=JSON.parse(req.body.user);
+    User.findOne({where:{id: userObject.id}})
     .then((user) => {
         if(!user){
             res.status(404).json({ message : "Utilisateur introuvable !" });
@@ -111,11 +109,12 @@ exports.modifyUser = (req, res, next) => {
         else{
           console.log("******: user trouvé");
           if(user.id=userId || isAdmin){
-                console.log("******: "+req.body.id);
-                console.log("+++++++: "+req.body.name);
-                User.update({name: req.body.name},{
+                console.log("******: "+userObject.id);
+                console.log("+++++++: "+userObject.name);
+                User.update({name: req.body.name, image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`}
+                ,{
                   where: {
-                    id: req.body.id
+                    id: userObject.id
                   }
                 })
                     .then(() => res.status(200).json({ message: "Compte mis à jour !" }))

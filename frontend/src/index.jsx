@@ -5,11 +5,11 @@ import Home from "./pages/Home";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import {createGlobalStyle} from "styled-components";
 import Header from "./components/Header";
-import Footer from "./components/Footer.index";
+import Footer from "./components/Footer";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Posts from "./pages/Posts";
+import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
-import Signup from "./pages/signup";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const GlobalStyle = createGlobalStyle`
@@ -37,7 +37,5 @@ root.render(
   </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+
 reportWebVitals();

@@ -34,3 +34,14 @@ export const StyledLink = styled(Link)`
     border-radius: 30px; 
     background-color: ${colors.primary};`}
 `
+
+export const MessageWarning = styled.div`
+  color: red;
+  text-align: center;
+  padding: 32px 0 0 0;
+`
+
+export const LoaderWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+`

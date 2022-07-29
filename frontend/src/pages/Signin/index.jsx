@@ -3,8 +3,9 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import styled from "styled-components"
 import {Loader} from "../../utils/style/Atoms"
+import {MessageWarning} from "../../utils/style/Atoms"
+import {LoaderWrapper} from "../../utils/style/Atoms"
 import {Link, useNavigate} from 'react-router-dom'
-
 
 const FormSignin = styled.form`
     padding: 32px;
@@ -13,15 +14,6 @@ const FormSignin = styled.form`
     flex-direction: column;
     align-items: center;
     font-weight: 500;
-`
-const LoaderWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`
-const MessageWarning = styled.div`
-  color: red;
-  text-align: center;
-  padding: 32px 0 0 0;
 `
 
 function Signin() {
@@ -51,9 +43,12 @@ function Signin() {
         try {
             const response = await fetch('http://localhost:3000/api/user/signin', requestOptions)
             const userDataJson = await response.json()
-            console.log(userDataJson)
-            console.log(userDataJson.userId)
+
             if (userDataJson.userId) {
+                localStorage.setItem('userId', userDataJson.userId)
+                /* Le localStorage ne stocke que des chaines de caractères nous devons donc faire appel à la méthode "JSON.stringify" */
+                localStorage.setItem('token', userDataJson.token);
+
                 setShouldRedirect(true)
             } else {
                 setIsCheckError(true)
