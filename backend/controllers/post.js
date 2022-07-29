@@ -5,6 +5,7 @@ const models = require('../models');
 const Post = models.Post;
 const User = models.User;
 const { encrypt, decrypt } = require('../utils/emailCrypto');
+const fs = require("fs");
 
 exports.create = (req, res, next) => {
     
@@ -49,6 +50,11 @@ exports.getAll = (req, res, next) => {
             model: User,
             attributes: ["name", "id"],
           },
+        {
+        model:Like,
+        attributes: ["PostId", "UserId"],
+        }
+          
         ],
       })
       .then((Posts) => res.status(201).json({Posts}))
@@ -59,24 +65,75 @@ exports.getAll = (req, res, next) => {
       })
      
     };
-exports.update = async (req, res, next) => {
-        console.log(req.body.id);
+exports.update = (req, res, next) => {
+  const postObject=JSON.parse(req.body.post);
+        console.log(postObject.id);
         Post.findOne({
           where: {
-            id: req.body.id,
+            id: postObject.id,
           },
         })
           .then(() => {
+            console.log(`${req.protocol}://${req.get('host')}/images/${req.file.filename}`);
             Post.update(
               {
-                message: req.body.message,
+                
+                image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+                message: postObject.message,
               },
               {
-                where: { id: req.body.id },
+                where: { id: postObject.id },
               }
             )
               .then(() => res.status(200).json({ message: "Post mis à jour !" }))
-              .catch((error) => res.status(400).json({ error }));
+              .catch((error) => res.status(400).json({ message:error.message }));
           })
-          .catch((error) => res.status(500).json({ error }));
+          .catch((error) => res.status(500).json({ message:error.message }));
+};
+// Suppression d'un post -------------------------------------------------------------------
+exports.delete = (req, res, next) => {
+
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
+  const userId = decodedToken.userId;
+  const isAdmin = decodedToken.isAdmin;
+  console.log(req.body.id);
+  Post.findOne({
+    attributes: [
+      "id",
+      "UserId",
+      "image",
+    ],
+    where: {
+      id: req.body.id,
+    },
+  })
+    .then((post) => {
+      console.log(isAdmin);
+      console.log("post.userId:"+post.UserId)
+      console.log("userID:"+userId)
+       if ((isAdmin) ||( post.UserId==userId)){
+          if (post.image !== null) {
+            // Si image présente on la supprime du répertoire, puis on supprime le post de la BDD
+            const filename = post.image.split("/images/")[1];
+            fs.unlink(`images/${filename}`, () => {
+              Post.destroy(
+                {where:{id: post.id}},
+                
+              );
+              res.status(200).json({ message: "Post supprimé !" });
+            });
+          } else { // Sinon on supprime uniquement le post
+            Post.destroy(
+              { where: { id: post.id }},
+            );
+            res.status(200).json({ message: "Post supprimé !" });
+          }
+      }
+      else {
+        res.status(403).json({ message : "Action non autorisée !" })
+          }
+    })
+
+    .catch((error) => res.status(500).json({ message:error.message }));
 };
