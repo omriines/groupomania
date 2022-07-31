@@ -24,15 +24,18 @@ export const Loader = styled.div`
 
 export const StyledLink = styled(Link)`
   padding: 10px 15px;
-  color: #8186a0;
+  color: #FD2D01;
   text-decoration: none;
   font-size: 18px;
   text-align: center;
   ${(props) =>
     props.$isFullLink &&
-    `color: white; 
+    `color: #FFD7D7; 
     border-radius: 30px; 
     background-color: ${colors.primary};`}
+  &:hover {
+  color: #FFD7D7;
+  }
 `
 
 export const MessageWarning = styled.div`

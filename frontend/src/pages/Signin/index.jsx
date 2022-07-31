@@ -6,6 +6,7 @@ import {Loader} from "../../utils/style/Atoms"
 import {MessageWarning} from "../../utils/style/Atoms"
 import {LoaderWrapper} from "../../utils/style/Atoms"
 import {Link, useNavigate} from 'react-router-dom'
+import {Alert} from "react-bootstrap";
 
 const FormSignin = styled.form`
     padding: 32px;
@@ -45,10 +46,7 @@ function Signin() {
             const userDataJson = await response.json()
 
             if (userDataJson.userId) {
-                localStorage.setItem('userId', userDataJson.userId)
-                /* Le localStorage ne stocke que des chaines de caractères nous devons donc faire appel à la méthode "JSON.stringify" */
-                localStorage.setItem('token', userDataJson.token);
-
+                localStorage.setItem('user', JSON.stringify(userDataJson))
                 setShouldRedirect(true)
             } else {
                 setIsCheckError(true)
@@ -72,9 +70,9 @@ function Signin() {
     return (
         <div>
             {isCheckError ? (
-                <MessageWarning>
+                <Alert key='danger' variant='danger'>
                     Veuillez verifier votre mail et mot de passe
-                </MessageWarning>
+                </Alert>
             ) : null}
             {isDataLoading ? (
                 <LoaderWrapper>

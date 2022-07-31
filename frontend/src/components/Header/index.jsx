@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 import styled from "styled-components";
 import logo from '../../assets/logo.png'
+import {StyledLink} from "../../utils/style/Atoms";
 const HomeLogo = styled.img`
   height: 100px;
 `
@@ -19,6 +20,13 @@ function Header() {
             <Link to="/">
                 <HomeLogo src={logo} />
             </Link>
+            <div>
+                <StyledLink to="/posts">Accueil</StyledLink>
+                <StyledLink to="/myposts" $isFullLink>
+                    Mes postes
+                </StyledLink>
+                <StyledLink to="/">Mon profil</StyledLink>
+            </div>
         </NavContainer>
     )
 }

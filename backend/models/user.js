@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     static associate(models) {
       models.User.hasMany(models.Like)
+      
     }
   }
   User.init({

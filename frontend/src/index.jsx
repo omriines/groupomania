@@ -10,6 +10,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Posts from "./pages/Posts";
 import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
+import MyPosts from "./pages/MyPosts";
+import Edit from "./pages/MyPosts/edit";
+import Create from "./pages/MyPosts/create";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const GlobalStyle = createGlobalStyle`
@@ -18,6 +21,10 @@ const GlobalStyle = createGlobalStyle`
     }
     body {
       margin: 0;
+    }
+    .card-body img {
+    width: 150px;
+    height: 150px;
     }
 `
 
@@ -29,6 +36,9 @@ root.render(
           <Routes>
             <Route path="/" exact element={<Home />} />
             <Route path="/posts" exact element={<Posts />} />
+            <Route path="/myposts" exact element={<MyPosts />} />
+              <Route path="/myposts/edit/:idPost" exact element={<Edit />} />
+              <Route path="/myposts/create" exact element={<Create />} />
             <Route path="/signin" exact element={<Signin />} />
             <Route path="/signup" exact element={<Signup />} />
           </Routes>
@@ -37,5 +47,7 @@ root.render(
   </React.StrictMode>
 );
 
-
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
