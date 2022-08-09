@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import styled from "styled-components"
@@ -18,19 +18,59 @@ const FormCreate = styled.form`
 `
 
 function Create() {
-    const { idPost } = useParams()
     const [isDataLoading, setDataLoading] = useState(false)
     const [error, setError] = useState(false)
     const [inputMessageValue, setInputMessageValue] = useState('')
     const [isMessage, setIsMessage] = useState(false)
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    const handleFileSelect = (event) => {
+        setSelectedFile(event.target.files[0])
+    }
 
     function handleInputMessage(e) {
         setInputMessageValue(e.target.value)
     }
 
-    async function createPost() {
-        setIsMessage(true)
+    async function handleSubmit() {
+        try {
+            const userStorage = JSON.parse(localStorage.getItem("user"))
+            const headers = new Headers(
+                {
+                    'Accept': 'application/json',
+                    'Authorization': 'Bearer ' + userStorage.token
+                }
+            );
+
+            const formData = new FormData();
+            const postData = JSON.stringify({
+                "message": inputMessageValue,
+                "UserId": userStorage.UserId
+            })
+            formData.append("post", postData);
+            formData.append("image", selectedFile);
+
+            const options = {
+                method: 'POST',
+                mode: 'cors',
+                headers,
+                body: formData
+
+            };
+
+            const response = await fetch(`http://localhost:3000/api/post/create`, options)
+            if (response.status === 201) {
+                setIsMessage(true)
+            }
+
+        } catch (err) {
+            console.log('===== error =====', err)
+            setError(true)
+        } finally {
+
+        }
     }
+
 
     if (error) {
         return <MessageWarning>Oups il y a eu un problème</MessageWarning>
@@ -52,14 +92,14 @@ function Create() {
                     <Form.Group className="mb-3" controlId="formBasicMessage">
                         <Form.Label>Message :</Form.Label>
                         <Form.Control as="textarea" rows={3} value={inputMessageValue}
-                                      onChange={handleInputMessage} />
+                                      onChange={handleInputMessage}/>
                     </Form.Group>
                     <Form.Group controlId="formFile" className="mb-3">
                         <Form.Label>Télécharger une Image</Form.Label>
-                        <Form.Control type="file" />
+                        <Form.Control type="file" onChange={handleFileSelect}/>
                     </Form.Group>
 
-                    <Button variant="primary" onClick={() => createPost()}>
+                    <Button variant="primary" onClick={() => handleSubmit()}>
                         Créer
                     </Button>
                 </FormCreate>

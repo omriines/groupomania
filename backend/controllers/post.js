@@ -16,12 +16,24 @@ exports.create = (req, res, next) => {
     const userId = decodedToken.userId;
     const isAdmin = decodedToken.isAdmin;
     console.log("userid:"+userId);
-  //  console.log(JSON.parse(req.body.message));
-  const postObject=JSON.parse(req.body.post);
-console.log("message:"+postObject.message);
+    const postObject=JSON.parse(req.body.post);
+    let postImage=""
+    if (req.body.image == null){
+      postImage=`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+      console.log(req.file.filename)
+    }else  
+    if(postImage.includes("http://localhost:3000/images/")){
+      postImage=req.body.image
+    };
+    // else{
+    //   postImage=`${req.protocol}://${req.get('host')}/images/${'post.jpg'}`
+    // };
+
+       console.log("message:"+postObject.message);
+       
        Post.create({
        message: postObject.message,
-       image : `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+       image : postImage,
        UserId:userId,
      }) 
      .then(() => res.status(201).json({ message: 'Post créé !' }))
@@ -89,7 +101,29 @@ exports.getPostById = (req, res, next) => {
       ],
       where:{UserId: userId,
         id:req.params.id
-      }
+      },
+      include: [
+        {
+          model: User,
+        },
+        // {
+        //           model : Like,
+        //           attributes: [ [sequelize.fn('COUNT', sequelize.col('postId')), 'count']]
+        //         },
+        {
+          model: Like,
+          attributes: ["PostId", "UserId"],
+
+          include: [
+            {
+              model: User,
+              attributes: ["id","name"],
+              where :{id:userId}
+            },
+          ],
+        },
+
+      ]
     })
     .then((post) => res.status(201).json({
       id:post.id,
@@ -112,44 +146,7 @@ exports.getAll = (req, res, next) => {
   const userId = decodedToken.userId;
   const isAdmin = decodedToken.isAdmin;
     console.log("entré dans API");
-    // Post.findAll({
-    //     attributes: [
-    //       "id",
-    //       "message",
-    //       "image",
-    //       "createdAt",
-    //       "updatedAt",
-    //       "userId",
-    //     ],
-    
-    //     order: [["createdAt", "DESC"]],
-    //     group:["id"],
-    
-    //     include: [
-    //       {
-    //         model : Like,
-    //         attributes: [ [sequelize.fn('COUNT', sequelize.col('likes.id')), 'count']]
-    //       },
-    //       {
-    //         model : User,
-    //         attributes: [ "id"]
-      
-    //       },
-    //       sequelize.literal(`(
-    //         SELECT id AS LikeUser
-    //         FROM Likes 
-    //         WHERE
-    //             Likes.userId = ${userId}
-    //             AND
-    //             Likes.postId = Posts.id
-    //     )`),
-    //     ],
-    //   }
-    //    )   
-    //   //************* */
-    
-      
-    //   //**************** */
+
     Post.findAll({
       attributes: [
         "id",
@@ -161,35 +158,36 @@ exports.getAll = (req, res, next) => {
       ],
   
       order: [["createdAt", "DESC"]],
-      group:["id"],
+    
   
       include: [
         {
           model: User,
-          attributes: ["name", "id"],
+          attributes: ["id","name"],
         },
-        {
-                  model : Like,as :'likeCount',
-                  attributes: [ [sequelize.fn('COUNT', sequelize.col('likes.id')), 'count']]
-                },
+        // {
+        //           model : Like,
+        //           attributes: [ [sequelize.fn('COUNT', sequelize.col('postId')), 'count']]
+        //         },
         {
           model: Like,
           attributes: ["PostId", "UserId"],
-          
+
           include: [
             {
               model: User,
-              attributes: ["name"],
-              where :{id:userId}
+              attributes: ["id","name"],
+          
             },
           ],
         },
-      
-       
+
       ],
     })
    
-      .then((Posts) => {res.status(201).json({Posts})
+      .then((Posts) => {
+
+          res.status(201).json({Posts})
       })
       .catch(error => {
         console.log(error);
@@ -199,23 +197,23 @@ exports.getAll = (req, res, next) => {
      
     };
 exports.update = (req, res, next) => {
-  console.log("***********");
-  console.log(req.body.post);
   const postObject=JSON.parse(req.body.post);
-  const postImage=req.body.file;
-  console.log(req.file.filename);
-        console.log(postObject.id);
+  let postImage="";
         Post.findOne({
           where: {
             id: postObject.id,
           },
         })
           .then(() => {
-        //    console.log(`${req.protocol}://${req.get('host')}/images/${req.file.filename}`);
+           if (req.body.image == null){
+              postImage=`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+            }else  
+            if(postImage.includes("http://localhost:3000/images/")){
+              postImage=req.body.image
+            };
             Post.update(
-              {
-                
-                image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+              {   
+                image: postImage,
                 message: postObject.message,
               },
               {

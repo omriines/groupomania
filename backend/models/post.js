@@ -7,7 +7,6 @@ module.exports = (sequelize, DataTypes) => {
 
     static associate(models) {
       models.Post.hasMany(models.Like)
-      models.Post.hasMany(models.Like,{as:'likeCount'})
       models.Post.belongsTo(models.User, {foreignKey: {allowNull: false}});
     }
   }
