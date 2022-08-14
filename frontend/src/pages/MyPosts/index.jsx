@@ -59,13 +59,14 @@ function Posts() {
         )
         const data = await response.json()
         setPostsList(data.Posts)
-        console.log(data.Posts)
-        //   setIsLoad()
+        console.log('fetch post' + data.Posts)
+        setIsLoad(1)
       } catch (err) {
         console.log('===== error =====', err)
         setError(true)
       } finally {
         setDataLoading(false)
+        setIsLoad(0)
       }
     }
     fetchPosts()
@@ -100,13 +101,15 @@ function Posts() {
       if (response.status === 200) {
         console.log('ines true')
         handleClose()
-        setIsLoad(isLoad + 1)
+        //setIsLoad(1)
+        window.location.reload()
       }
     } catch (err) {
       console.log('===== error =====', err)
       setError(true)
     } finally {
       setDataLoading(false)
+      setIsLoad(0)
     }
 
     handleClose()
@@ -139,7 +142,7 @@ function Posts() {
             </thead>
             <tbody>
               {postsList.map((post) => (
-                <tr>
+                <tr key={`${post.id}`}>
                   <td>
                     <img src={post.image} width={30} height={30} />
                   </td>

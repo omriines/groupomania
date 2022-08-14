@@ -51,6 +51,7 @@ exports.signin = (req, res, next) => {
             res.status(200).json({
               userId: user.id,
               name: user.name,
+              admin:user.admin,
               email: decrypt(user.email),
                //Encoder un nouveau token
                token :jwt.sign(
