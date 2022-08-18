@@ -8,7 +8,8 @@ import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../../utils/context/user'
 
 const HomeLogo = styled.img`
-  height: 100px;
+  height: 50px;
+  padding-bottom: 8px;
 `
 
 const NavContainer = styled.nav`
@@ -48,9 +49,12 @@ function Header() {
       localStorage.clear()
       navigate('/signin')
     }
+    //console.log(user.length)
     if (user.length !== 0) {
-      // const userObj = JSON.parse(user)
-      // setUserName(userObj.name)
+      //console.log(user.name)
+      //const userObj = JSON.parse(user)
+      //console.log(userObj)
+      //setUserName(userObj.name)
       setIsToDisplay(true)
     } else {
       setIsToDisplay(false)
@@ -58,6 +62,8 @@ function Header() {
   }, [user])
 
   function handleLogout() {
+    setIsActive(true)
+    setIsActiveSecond(false)
     setIsToDisplay(false)
     localStorage.clear()
     navigate('/signin')
@@ -86,8 +92,8 @@ function Header() {
               Mes postes
             </StyledLink>
           </div>
-          <NavDropdown title="omri ines" id="nav-dropdown">
-            <NavDropdown.Item eventKey="4.1">omri ines</NavDropdown.Item>
+          <NavDropdown title="Ines Omri" id="nav-dropdown">
+            <NavDropdown.Item eventKey="4.1">Ines Omri</NavDropdown.Item>
             <NavDropdown.Divider />
             <NavDropdown.Item eventKey="4.2" onClick={() => handleLogout()}>
               Déconnexion

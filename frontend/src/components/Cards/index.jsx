@@ -1,4 +1,6 @@
 import Card from 'react-bootstrap/Card'
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import { useState } from 'react'
@@ -8,6 +10,7 @@ import { Link } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import { MessageWarning } from '../../utils/style/Atoms'
+import moment from 'moment'
 
 export const CardPost = styled.div`
   margin-top: 50px !important;
@@ -39,8 +42,13 @@ const CrudAdmin = styled.span`
   float: right;
 `
 
+const DatePost = styled.span`
+  float: right;
+  color: #fd2d01;
+  font-size: 13px;
+`
+
 function Cards({ post }) {
-  // const [checked, setChecked] = useState(post.Likes.length === 0 ? false : true);
   const userStorage = JSON.parse(localStorage.getItem('user'))
   let result = false
   const [countLikes, setCountLikes] = useState(post.Likes.length)
@@ -62,16 +70,9 @@ function Cards({ post }) {
     }
   }
   const [checked, setChecked] = useState(result)
-  // post.Likes?.forEach(element => {
-  //     if (element.UserId === userStorage.userId)
-  //         {
-  //             result= true
-  //         }
-  // })
+
   async function likeAction(postId) {
     setError(false)
-    //   const userStorage = JSON.parse(localStorage.getItem("user"))
-
     const headers = new Headers({
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + userStorage.token,
@@ -107,10 +108,12 @@ function Cards({ post }) {
       setDataLoading(false)
     }
   }
+
   function deletePost(postId) {
     setIdPostDelete(postId)
     handleShow()
   }
+
   async function confirmDelete() {
     const userStorage = JSON.parse(localStorage.getItem('user'))
     const headers = new Headers({
@@ -152,6 +155,7 @@ function Cards({ post }) {
   if (error) {
     return <MessageWarning>Oups il y a eu un problème</MessageWarning>
   }
+
   return (
     <div>
       {isDataLoading ? (
@@ -160,39 +164,52 @@ function Cards({ post }) {
         </LoaderWrapper>
       ) : (
         <CardWrapper>
-          <Card>
-            <Card.Header as="h5">{post.User.name}</Card.Header>
-            <Card.Body>
-              <Card.Img variant="top" src={post.image} />
-              <Card.Text>{post.message}</Card.Text>
-            </Card.Body>
-            <Card.Footer>
-              <CountLike>{countLikes}</CountLike>
+          <Col>
+            <Card>
+              <Card.Header as="h6">
+                Par {post.User.name}
+                <DatePost>
+                  Publié le {moment(post.createdAt).format('DD/MM/YYYY')}
+                </DatePost>
+              </Card.Header>
+              <Card.Body>
+                <Card.Img variant="top" src={post.image} />
+                <Card.Text>{post.message}</Card.Text>
+              </Card.Body>
+              <Card.Footer>
+                <CountLike>{countLikes}</CountLike>
 
-              {checked ? (
-                <ButtonLike onClick={() => likeAction(post.id)}>
-                  J'aime(s)
-                </ButtonLike>
-              ) : (
-                <ButtonDisLike onClick={() => likeAction(post.id)}>
-                  J'aime(s)
-                </ButtonDisLike>
-              )}
-              {error ? (
-                <Alert key="danger" variant="danger">
-                  Oups il y a eu un problème
-                </Alert>
-              ) : null}
-              {isAdmin ? (
-                <CrudAdmin>
-                  <Link to={`/myposts/edit/${post.id}`}>Modification</Link>
-                  <Button variant="danger" onClick={() => deletePost(post.id)}>
-                    Suppression
-                  </Button>
-                </CrudAdmin>
-              ) : null}
-            </Card.Footer>
-          </Card>
+                {checked ? (
+                  <ButtonLike onClick={() => likeAction(post.id)}>
+                    J'aime(s)
+                  </ButtonLike>
+                ) : (
+                  <ButtonDisLike onClick={() => likeAction(post.id)}>
+                    J'aime(s)
+                  </ButtonDisLike>
+                )}
+                {error ? (
+                  <Alert key="danger" variant="danger">
+                    Oups il y a eu un problème
+                  </Alert>
+                ) : null}
+                {isAdmin ? (
+                  <CrudAdmin>
+                    <Link to={`/myposts/edit/${post.id}`}>
+                      <Button variant="secondary">Modification</Button>
+                    </Link>
+                    <Button
+                      className="margin-left-20"
+                      variant="danger"
+                      onClick={() => deletePost(post.id)}
+                    >
+                      Suppression
+                    </Button>
+                  </CrudAdmin>
+                ) : null}
+              </Card.Footer>
+            </Card>
+          </Col>
           <Modal show={show} onHide={handleClose}>
             <Modal.Header closeButton>
               <Modal.Title>Suppression</Modal.Title>

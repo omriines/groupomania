@@ -176,6 +176,7 @@ exports.getAll = (req, res, next) => {
      
     };
 exports.update = (req, res, next) => {
+  console.log("dans update");
   const postObject=JSON.parse(req.body.post);
   let postImage="";
         Post.findOne({
@@ -187,8 +188,9 @@ exports.update = (req, res, next) => {
            if (req.body.image == null){
               postImage=`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             }else  
-            if(postImage.includes("http://localhost:3000/images/")){
+            if(req.body.image .includes("http://localhost:3000/images/")){
               postImage=req.body.image
+              console.log("postImage:"+postImage);
             };
             Post.update(
               {   

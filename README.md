@@ -46,15 +46,8 @@ Indication:
 
 Avant d'accéder à l'application, vous devrez installer dotenv: npm install dotenv et créer un fichier d'environnement nommé .env dans le répertoire racine du dossier backend. Dans le fichier .env, ajoutez vos variables d'environnement comme ci-dessous :
 
-DB_USERNAME='Nom de L'utilisateur de la base de données MySQL'
-
-DB_PASSWORD='mot de passe de l'utilisateur de la base de données MySQL'
-
-DB_HOST='lien de la base de données MySQL'
-
-DB_Name='nom de la base de données MySQL'
-
-SECRET_KEY='clé secrète du token qui doit être difficile à pirater'
+JWT_TOKEN_KEY =''
+CRYPTOJS_KEY  
 
 Pour la sécurité de l'application, installez:
 

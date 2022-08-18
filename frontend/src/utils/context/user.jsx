@@ -4,6 +4,7 @@ export const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState([])
+  console.log('aaa' + user)
   useEffect(() => {
     const loggedInUser = localStorage.getItem('user')
     if (loggedInUser) {
