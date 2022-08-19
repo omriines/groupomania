@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
 import moment from 'moment'
-import {Alert} from "react-bootstrap";
+import { Alert } from 'react-bootstrap'
 import { useParams } from 'react-router-dom'
 
 const CardsContainer = styled.div`
@@ -123,13 +123,11 @@ function Posts() {
 
   return (
     <PostsContainer>
-      {message=='success'
-          ? (
-              <Alert key="success" variant="success">
-                Votre poste a été crée avec succès!
-              </Alert>
-          )
-          : null}
+      {message == 'success' ? (
+        <Alert key="success" variant="success">
+          Votre poste a été crée avec succès!
+        </Alert>
+      ) : null}
       <PageTitle>Mes postes :</PageTitle>
       {isDataLoading ? (
         <LoaderWrapper>
@@ -138,7 +136,9 @@ function Posts() {
       ) : (
         <CardsContainer>
           <ButtonCreate>
-            <Link to={`/myposts/create`}><Button variant="primary">Créer une poste</Button></Link>
+            <Link to={`/myposts/create`}>
+              <Button variant="primary">Créer une poste</Button>
+            </Link>
           </ButtonCreate>
           <Table striped bordered hover>
             <thead>
@@ -155,17 +155,13 @@ function Posts() {
                   <td>
                     <img src={post.image} width={30} height={30} />
                   </td>
-                  <td>
-
-                    {`${post.message.substring(0, 50)}...`}
-                  </td>
-                  <td>{moment(post.createdAt).format("DD/MM/YYYY")}</td>
-                  <td>
+                  <td>{post.message}</td>
+                  <td>{moment(post.createdAt).format('DD/MM/YYYY')}</td>
+                  <td className="button">
                     <Link to={`/myposts/edit/${post.id}`}>
                       <Button variant="secondary">Modification</Button>
                     </Link>
                     <Button
-                        className="margin-left-20"
                       variant="danger"
                       onClick={() => deletePost(post.id)}
                     >
