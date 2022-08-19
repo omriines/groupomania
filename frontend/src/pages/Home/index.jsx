@@ -1,8 +1,11 @@
-import Posts from "../Posts";
+import Posts from "../Posts"
+import Container from "react-bootstrap/Container";
 
 function Home() {
     return (
+        <Container fluid="md">
         <Posts />
+        </Container>
     )
 }
 

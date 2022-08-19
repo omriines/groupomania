@@ -5,24 +5,24 @@ import styled from "styled-components"
 import {Loader} from "../../utils/style/Atoms"
 import {MessageWarning} from "../../utils/style/Atoms"
 import {LoaderWrapper} from "../../utils/style/Atoms"
-import {useParams} from 'react-router-dom'
-import {Alert} from "react-bootstrap";
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import {Link, useNavigate} from 'react-router-dom'
 
-const FormCreate = styled.form`
-    padding: 32px;
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: column;
-    align-items: center;
-    font-weight: 500;
+const Title = styled.h1`
+  font-size:2.5rem;
+  margin-top:30px
 `
 
 function Create() {
+    const navigate = useNavigate()
     const [isDataLoading, setDataLoading] = useState(false)
     const [error, setError] = useState(false)
     const [inputMessageValue, setInputMessageValue] = useState('')
     const [isMessage, setIsMessage] = useState(false)
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null)
+    const [validated, setValidated] = useState(false)
 
     const handleFileSelect = (event) => {
         setSelectedFile(event.target.files[0])
@@ -32,7 +32,7 @@ function Create() {
         setInputMessageValue(e.target.value)
     }
 
-    async function handleSubmit() {
+    async function createSubmit() {
         try {
             const userStorage = JSON.parse(localStorage.getItem("user"))
             const headers = new Headers(
@@ -60,7 +60,7 @@ function Create() {
 
             const response = await fetch(`http://localhost:3000/api/post/create`, options)
             if (response.status === 201) {
-                setIsMessage(true)
+                navigate('/myposts/success')
             }
 
         } catch (err) {
@@ -71,40 +71,82 @@ function Create() {
         }
     }
 
+    const handleSubmit = (event) => {
+        const form = event.currentTarget
+        if (form.checkValidity() === false) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+
+        setValidated(true)
+        if (form.checkValidity() === true) {
+            event.preventDefault()
+            event.stopPropagation()
+            createSubmit()
+        }
+    }
 
     if (error) {
         return <MessageWarning>Oups il y a eu un problème</MessageWarning>
     }
 
     return (
-        <div>
-            {isMessage ? (
-                <Alert key='success' variant='success'>
-                    Votre poste a été crée avec succès!
-                </Alert>
-            ) : null}
+        <Container fluid="md">
             {isDataLoading ? (
                 <LoaderWrapper>
                     <Loader/>
                 </LoaderWrapper>
             ) : (
-                <FormCreate>
-                    <Form.Group className="mb-3" controlId="formBasicMessage">
-                        <Form.Label>Message :</Form.Label>
-                        <Form.Control as="textarea" rows={3} value={inputMessageValue}
-                                      onChange={handleInputMessage}/>
-                    </Form.Group>
-                    <Form.Group controlId="formFile" className="mb-3">
-                        <Form.Label>Télécharger une Image</Form.Label>
-                        <Form.Control type="file" onChange={handleFileSelect}/>
-                    </Form.Group>
-
-                    <Button variant="primary" onClick={() => handleSubmit()}>
-                        Créer
-                    </Button>
-                </FormCreate>
+                <div>
+                    <Row className="justify-content-md-center">
+                        <Col md="auto"><Title>Créer une poste</Title></Col>
+                    </Row>
+                    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+                        <Row className="mb-3">
+                            <Form.Group as={Col} md="12" controlId="validationCustomMessage">
+                                <Form.Label className="margin-top-30">Message :</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    required
+                                    placeholder="Message"
+                                    value={inputMessageValue}
+                                    onChange={handleInputMessage}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Veuillez choisir un message.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Row>
+                        <Row className="mb-3">
+                            <Form.Group as={Col} md="12" controlId="validationFormFile">
+                                <Form.Label className="margin-top-30">Télécharger une Image :</Form.Label>
+                                <Form.Control
+                                    required
+                                    type="file"
+                                    onChange={handleFileSelect}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Veuillez choisir une image.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Row>
+                        <Row className="justify-content-md-center">
+                            <Col md="auto">
+                                <Link to={`/myposts`}>
+                                    <Button variant="secondary" size="lg">
+                                        Anunuler
+                                    </Button>
+                                </Link>
+                                <Button className="margin-left-20" type="submit" variant="primary" size="lg">
+                                    Enregistrer
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Form>
+                </div>
             )}
-        </div>
+        </Container>
     )
 
 }

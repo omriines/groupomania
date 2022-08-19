@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useState, useContext} from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import styled from "styled-components"
@@ -6,15 +6,18 @@ import {Loader} from "../../utils/style/Atoms"
 import {MessageWarning} from "../../utils/style/Atoms"
 import {LoaderWrapper} from "../../utils/style/Atoms"
 import {useNavigate} from 'react-router-dom'
+import {UserContext} from '../../utils/context/user'
+import InputGroup from 'react-bootstrap/InputGroup';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 
-const FormSignin = styled.form`
-    padding: 32px;
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: column;
-    align-items: center;
-    font-weight: 500;
+const Title = styled.h1`
+  font-size:2.5rem;
+  margin-top:30px
 `
+
+
 
 function Signup() {
     const [isDataLoading, setDataLoading] = useState(false)
@@ -22,9 +25,10 @@ function Signup() {
     const [inputMailValue, setInputMailValue] = useState('')
     const [inputPasswordValue, setInputPasswordValue] = useState('')
     const [inputNameValue, setInputNameValue] = useState('')
-    const [shouldRedirect, setShouldRedirect] = useState(false)
     const navigate = useNavigate()
     const [isCheckError, setIsCheckError] = useState(false)
+    const {user, authenticateUser} = useContext(UserContext)
+    const [validated, setValidated] = useState(false);
 
     function handleInputMail(e) {
         setInputMailValue(e.target.value)
@@ -48,9 +52,12 @@ function Signup() {
         try {
             const response = await fetch('http://localhost:3000/api/user/signup', requestOptions)
             const userDataJson = await response.json()
-            console.log(response.status)
             if (response.status === 201) {
-                setShouldRedirect(true)
+                localStorage.setItem('user', JSON.stringify(userDataJson))
+                const now = new Date().getTime()
+                localStorage.setItem('setupTime', now)
+                authenticateUser(JSON.stringify(userDataJson))
+                navigate('/')
             } else {
                 setIsCheckError(true)
             }
@@ -62,16 +69,26 @@ function Signup() {
         }
     }
 
+    const handleSubmit = (event) => {
+        const form = event.currentTarget
+        if (form.checkValidity() === false) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+
+        setValidated(true)
+        console.log(form.checkValidity())
+        if (form.checkValidity() === true) {
+            Login()
+        }
+    }
+
     if (error) {
         return <MessageWarning>Oups il y a eu un problème</MessageWarning>
     }
 
-    if (shouldRedirect) {
-        navigate('/posts')
-    }
-
     return (
-        <div>
+        <Container fluid="md">
             {isCheckError ? (
                 <MessageWarning>
                     Mail trouvé, Veuillez changer l'email
@@ -82,30 +99,65 @@ function Signup() {
                     <Loader/>
                 </LoaderWrapper>
             ) : (
-                <FormSignin>
-                    <Form.Group className="mb-3" controlId="formBasicName">
-                        <Form.Label>Nom:</Form.Label>
-                        <Form.Control type="name" placeholder="Nom" value={inputNameValue}
-                                      onChange={handleInputName}/>
-                    </Form.Group>
-
-                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                        <Form.Label>Adresse E-mail:</Form.Label>
-                        <Form.Control type="email" placeholder="Adresse E-mail" value={inputMailValue}
-                                      onChange={handleInputMail}/>
-                    </Form.Group>
-
-                    <Form.Group className="mb-3" controlId="formBasicPassword">
-                        <Form.Label>Mot de passe:</Form.Label>
-                        <Form.Control type="password" placeholder="Mot de passe" value={inputPasswordValue}
-                                      onChange={handleInputPassword}/>
-                    </Form.Group>
-                    <Button variant="primary" onClick={() => Login()}>
-                        S'inscrire
-                    </Button>
-                </FormSignin>
+                <div>
+                    <Row className="justify-content-md-center">
+                        <Col md="auto"><Title>Inscription</Title></Col>
+                    </Row>
+                    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+                        <Row className="mb-3">
+                            <Form.Group as={Col} md="12" controlId="validationCustomName">
+                                <Form.Label className="margin-top-30">Nom et prénom</Form.Label>
+                                <Form.Control
+                                    required
+                                    type="text"
+                                    placeholder="Nom et prénom"
+                                    value={inputNameValue}
+                                    onChange={handleInputName}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Veuillez choisir un nom et prénom.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group as={Col} md="12" controlId="validationCustomEmail">
+                                <Form.Label className="margin-top-30">Email:</Form.Label>
+                                <InputGroup hasValidation>
+                                    <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
+                                    <Form.Control
+                                        type="email"
+                                        placeholder="Email"
+                                        aria-describedby="inputGroupPrepend"
+                                        value={inputMailValue}
+                                        onChange={handleInputMail}
+                                        required
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Veuillez choisir un mail.
+                                    </Form.Control.Feedback>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="12" controlId="validationCustom03">
+                                <Form.Label className="margin-top-30">Mot de passe:</Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    placeholder="Mot de passe"
+                                    value={inputPasswordValue}
+                                    onChange={handleInputPassword}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Veuillez choisir un mot de passe.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Row>
+                        <Row className="justify-content-md-center">
+                            <Col md="auto">
+                                <Button type="submit">S'inscrire</Button>
+                            </Col>
+                        </Row>
+                    </Form>
+                </div>
             )}
-        </div>
+        </Container>
     )
 
 }

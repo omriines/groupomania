@@ -90,6 +90,7 @@ exports.getPostById = (req, res, next) => {
   const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
   const userId = decodedToken.userId;
   const isAdmin = decodedToken.isAdmin;
+  console.log("id:"+req.params.id);
   Post.findOne({
       attributes: [
         "id",
@@ -99,31 +100,9 @@ exports.getPostById = (req, res, next) => {
         "updatedAt",
         "UserId",
       ],
-      where:{UserId: userId,
+      where:{
         id:req.params.id
       },
-      include: [
-        {
-          model: User,
-        },
-        // {
-        //           model : Like,
-        //           attributes: [ [sequelize.fn('COUNT', sequelize.col('postId')), 'count']]
-        //         },
-        {
-          model: Like,
-          attributes: ["PostId", "UserId"],
-
-          include: [
-            {
-              model: User,
-              attributes: ["id","name"],
-              where :{id:userId}
-            },
-          ],
-        },
-
-      ]
     })
     .then((post) => res.status(201).json({
       id:post.id,
@@ -197,6 +176,7 @@ exports.getAll = (req, res, next) => {
      
     };
 exports.update = (req, res, next) => {
+  console.log("dans update");
   const postObject=JSON.parse(req.body.post);
   let postImage="";
         Post.findOne({
@@ -208,8 +188,9 @@ exports.update = (req, res, next) => {
            if (req.body.image == null){
               postImage=`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             }else  
-            if(postImage.includes("http://localhost:3000/images/")){
+            if(req.body.image .includes("http://localhost:3000/images/")){
               postImage=req.body.image
+              console.log("postImage:"+postImage);
             };
             Post.update(
               {   
@@ -252,6 +233,10 @@ exports.delete = (req, res, next) => {
             // Si image présente on la supprime du répertoire, puis on supprime le post de la BDD
             const filename = post.image.split("/images/")[1];
             fs.unlink(`images/${filename}`, () => {
+              Like.destroy(
+                {where:{PostId: post.id}},
+                
+              );
               Post.destroy(
                 {where:{id: post.id}},
                 

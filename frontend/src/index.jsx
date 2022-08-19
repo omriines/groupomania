@@ -24,9 +24,22 @@ body {
 margin: 0;
 }
 .card-body img {
-width: 50%;
-height: 150px;
+width: 100%;
+height: 160px;
+margin-bottom:15px
 }
+.margin-top-30 {
+margin-top:30px
+}
+.margin-left-20 {
+margin-left:20px
+}
+
+@media screen and (max-width: 576px) {
+margin-left-20 : 0px !important;
+margin-top 10px !important;
+}
+
 `
 
 root.render(
@@ -38,7 +51,10 @@ root.render(
         <Routes>
           <Route path="/" exact element={<Home />} />
           <Route path="/posts" exact element={<Posts />} />
-          <Route path="/myposts" exact element={<MyPosts />} />
+          <Route path="/myposts">
+            <Route path="" element={<MyPosts />} />
+            <Route path=":message" element={<MyPosts />} />
+          </Route>
           <Route path="/myposts/edit/:idPost" exact element={<Edit />} />
           <Route path="/myposts/create" exact element={<Create />} />
           <Route path="/signin" exact element={<Signin />} />

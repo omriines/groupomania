@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { MessageWarning } from '../../utils/style/Atoms'
 import { LoaderWrapper } from '../../utils/style/Atoms'
 import { Loader } from '../../utils/style/Atoms'
@@ -7,6 +7,9 @@ import Table from 'react-bootstrap/Table'
 import { Link } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
+import moment from 'moment'
+import {Alert} from "react-bootstrap";
+import { useParams } from 'react-router-dom'
 
 const CardsContainer = styled.div`
   margin-top: 0px;
@@ -34,6 +37,7 @@ function Posts() {
   const [show, setShow] = useState(false)
   const [idPostDelete, setIdPostDelete] = useState()
   const [isLoad, setIsLoad] = useState(0)
+  const { message } = useParams()
 
   const handleClose = () => setShow(false)
   const handleShow = () => setShow(true)
@@ -59,13 +63,13 @@ function Posts() {
         )
         const data = await response.json()
         setPostsList(data.Posts)
-        console.log(data.Posts)
-        //   setIsLoad()
+        setIsLoad(1)
       } catch (err) {
         console.log('===== error =====', err)
         setError(true)
       } finally {
         setDataLoading(false)
+        setIsLoad(0)
       }
     }
     fetchPosts()
@@ -82,7 +86,7 @@ function Posts() {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + userStorage.token,
     })
-    console.log(idPostDelete)
+
     const options = {
       method: 'DELETE',
       mode: 'cors',
@@ -98,15 +102,16 @@ function Posts() {
       )
       const responseData = await response.json()
       if (response.status === 200) {
-        console.log('ines true')
         handleClose()
-        setIsLoad(isLoad + 1)
+        //setIsLoad(1)
+        window.location.reload()
       }
     } catch (err) {
       console.log('===== error =====', err)
       setError(true)
     } finally {
       setDataLoading(false)
+      setIsLoad(0)
     }
 
     handleClose()
@@ -115,9 +120,16 @@ function Posts() {
   if (error) {
     return <MessageWarning>Oups il y a eu un problème</MessageWarning>
   }
-  console.log('load:' + isLoad)
+
   return (
     <PostsContainer>
+      {message=='success'
+          ? (
+              <Alert key="success" variant="success">
+                Votre poste a été crée avec succès!
+              </Alert>
+          )
+          : null}
       <PageTitle>Mes postes :</PageTitle>
       {isDataLoading ? (
         <LoaderWrapper>
@@ -126,7 +138,7 @@ function Posts() {
       ) : (
         <CardsContainer>
           <ButtonCreate>
-            <Link to={`/myposts/create`}>Créer une poste</Link>
+            <Link to={`/myposts/create`}><Button variant="primary">Créer une poste</Button></Link>
           </ButtonCreate>
           <Table striped bordered hover>
             <thead>
@@ -139,15 +151,21 @@ function Posts() {
             </thead>
             <tbody>
               {postsList.map((post) => (
-                <tr>
+                <tr key={`${post.id}`}>
                   <td>
                     <img src={post.image} width={30} height={30} />
                   </td>
-                  <td>{post.message}</td>
-                  <td>{post.createdAt}</td>
                   <td>
-                    <Link to={`/myposts/edit/${post.id}`}>Modification</Link>
+
+                    {`${post.message.substring(0, 50)}...`}
+                  </td>
+                  <td>{moment(post.createdAt).format("DD/MM/YYYY")}</td>
+                  <td>
+                    <Link to={`/myposts/edit/${post.id}`}>
+                      <Button variant="secondary">Modification</Button>
+                    </Link>
                     <Button
+                        className="margin-left-20"
                       variant="danger"
                       onClick={() => deletePost(post.id)}
                     >

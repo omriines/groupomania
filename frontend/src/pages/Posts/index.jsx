@@ -4,6 +4,7 @@ import {LoaderWrapper} from "../../utils/style/Atoms"
 import {Loader} from "../../utils/style/Atoms"
 import Cards from "../../components/Cards";
 import styled from "styled-components";
+import Row from 'react-bootstrap/Row';
 
 const CardsContainer = styled.div`
   margin-top: 20px
@@ -69,12 +70,14 @@ function Posts() {
                 </LoaderWrapper>
             ) : (
                 <CardsContainer>
+                    <Row xs={1} md={2} className="g-4">
                     {postsList.map((post) => (
                         <Cards
                             key={`${post.id}`}
                             post={post}
                         />
                     ))}
+                    </Row>
                 </CardsContainer>
             )}
         </PostsContainer>
