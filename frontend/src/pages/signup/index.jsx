@@ -27,7 +27,7 @@ function Signup() {
     const [inputNameValue, setInputNameValue] = useState('')
     const navigate = useNavigate()
     const [isCheckError, setIsCheckError] = useState(false)
-    const {setUser, user} = useContext(UserContext)
+    const {user, authenticateUser} = useContext(UserContext)
     const [validated, setValidated] = useState(false);
 
     function handleInputMail(e) {
@@ -49,7 +49,6 @@ function Signup() {
             body: JSON.stringify({name: inputNameValue, email: inputMailValue, password: inputPasswordValue})
         };
         setDataLoading(true)
-        console.log(requestOptions)
         try {
             const response = await fetch('http://localhost:3000/api/user/signup', requestOptions)
             const userDataJson = await response.json()
@@ -57,7 +56,7 @@ function Signup() {
                 localStorage.setItem('user', JSON.stringify(userDataJson))
                 const now = new Date().getTime()
                 localStorage.setItem('setupTime', now)
-                setUser(JSON.stringify(userDataJson))
+                authenticateUser(JSON.stringify(userDataJson))
                 navigate('/')
             } else {
                 setIsCheckError(true)

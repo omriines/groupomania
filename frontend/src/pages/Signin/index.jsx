@@ -25,7 +25,7 @@ function Signin() {
     const [inputPasswordValue, setInputPasswordValue] = useState('')
     const navigate = useNavigate()
     const [isCheckError, setIsCheckError] = useState(false)
-    const {setUser, user} = useContext(UserContext)
+    const {user, authenticateUser} = useContext(UserContext)
     const [validated, setValidated] = useState(false);
 
     function handleInputMail(e) {
@@ -54,10 +54,12 @@ function Signin() {
             const userDataJson = await response.json()
 
             if (userDataJson.userId) {
+                //const userDataJsonWitoutAdmin = JSON.parse(JSON.stringify(userDataJson))
+                //delete userDataJsonWitoutAdmin.admin
                 localStorage.setItem('user', JSON.stringify(userDataJson))
                 const now = new Date().getTime()
                 localStorage.setItem('setupTime', now)
-                setUser(JSON.stringify(userDataJson))
+                authenticateUser(JSON.stringify(userDataJson))
                 navigate('/')
             } else {
                 setIsCheckError(true)
@@ -70,19 +72,20 @@ function Signin() {
         }
     }
 
-  const handleSubmit = (event) => {
-    const form = event.currentTarget
-    if (form.checkValidity() === false) {
-      event.preventDefault()
-      event.stopPropagation()
-    }
+    const handleSubmit = (event) => {
+        const form = event.currentTarget
+        if (form.checkValidity() === false) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
 
-    setValidated(true)
-    console.log(form.checkValidity())
-    if (form.checkValidity() === true) {
-      Login()
+        setValidated(true)
+        if (form.checkValidity() === true) {
+            event.preventDefault()
+            event.stopPropagation()
+            Login()
+        }
     }
-  }
 
     if (error) {
         return <MessageWarning>Oups il y a eu un problème</MessageWarning>
@@ -101,53 +104,53 @@ function Signin() {
                 </LoaderWrapper>
             ) : (
                 <div>
-                  <Row className="justify-content-md-center">
-                    <Col md="auto"><Title>Connexion à votre compte</Title></Col>
-                  </Row>
-                  <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                    <Row className="mb-3">
-                      <Form.Group as={Col} md="12" controlId="validationCustomEmail">
-                        <Form.Label className="margin-top-30">Email:</Form.Label>
-                        <InputGroup hasValidation>
-                          <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
-                          <Form.Control
-                              type="email"
-                              placeholder="Email"
-                              aria-describedby="inputGroupPrepend"
-                              value={inputMailValue}
-                              onChange={handleInputMail}
-                              required
-                          />
-                          <Form.Control.Feedback type="invalid">
-                            Veuillez choisir un mail.
-                          </Form.Control.Feedback>
-                        </InputGroup>
-                      </Form.Group>
-                      <Form.Group as={Col} md="12" controlId="validationCustom03">
-                        <Form.Label className="margin-top-30">Mot de passe:</Form.Label>
-                        <Form.Control
-                            type="password"
-                            placeholder="Mot de passe"
-                            value={inputPasswordValue}
-                            onChange={handleInputPassword}
-                            required
-                        />
-                        <Form.Control.Feedback type="invalid">
-                          Veuillez choisir un mot de passe.
-                        </Form.Control.Feedback>
-                      </Form.Group>
-                    </Row>
                     <Row className="justify-content-md-center">
-                      <Col md="auto">
-                        <Button type="submit">Se connecter</Button>
-                      </Col>
+                        <Col md="auto"><Title>Connexion à votre compte</Title></Col>
                     </Row>
-                    <Row className="justify-content-md-center">
-                      <Col md="auto">
-                        <Link to="/signup">Créer nouveau compte</Link>
-                      </Col>
-                    </Row>
-                  </Form>
+                    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+                        <Row className="mb-3">
+                            <Form.Group as={Col} md="12" controlId="validationCustomEmail">
+                                <Form.Label className="margin-top-30">Email:</Form.Label>
+                                <InputGroup hasValidation>
+                                    <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
+                                    <Form.Control
+                                        type="email"
+                                        placeholder="Email"
+                                        aria-describedby="inputGroupPrepend"
+                                        value={inputMailValue}
+                                        onChange={handleInputMail}
+                                        required
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Veuillez choisir un mail.
+                                    </Form.Control.Feedback>
+                                </InputGroup>
+                            </Form.Group>
+                            <Form.Group as={Col} md="12" controlId="validationCustom03">
+                                <Form.Label className="margin-top-30">Mot de passe:</Form.Label>
+                                <Form.Control
+                                    type="password"
+                                    placeholder="Mot de passe"
+                                    value={inputPasswordValue}
+                                    onChange={handleInputPassword}
+                                    required
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Veuillez choisir un mot de passe.
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                        </Row>
+                        <Row className="justify-content-md-center">
+                            <Col md="auto">
+                                <Button type="submit">Se connecter</Button>
+                            </Col>
+                        </Row>
+                        <Row className="justify-content-md-center">
+                            <Col md="auto">
+                                <Link to="/signup">Créer nouveau compte</Link>
+                            </Col>
+                        </Row>
+                    </Form>
                 </div>
             )}
         </Container>

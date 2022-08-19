@@ -55,7 +55,7 @@ npm install --save bcrypt,
 
 npm install --save jsonwebtoken,
 
-lancez le serveur: nodemon server
+lancez le serveur: nodemon server: npm run dev
 Exécution de l’api sur http://localhost:3000
 
 *Frontend*

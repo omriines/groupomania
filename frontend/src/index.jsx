@@ -18,15 +18,15 @@ import { UserProvider } from './utils/context/user'
 const root = ReactDOM.createRoot(document.getElementById('root'))
 const GlobalStyle = createGlobalStyle`
 * {
-font-family: 'Lato', Helvetica, sans-serif;
+font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
 body {
 margin: 0;
 }
 .card-body img {
-margin-bottom:10px;
 width: 100%;
 height: 160px;
+margin-bottom:15px
 }
 .margin-top-30 {
 margin-top:30px
@@ -34,6 +34,12 @@ margin-top:30px
 .margin-left-20 {
 margin-left:20px
 }
+
+@media screen and (max-width: 576px) {
+margin-left-20 : 0px !important;
+margin-top 10px !important;
+}
+
 `
 
 root.render(

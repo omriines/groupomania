@@ -51,13 +51,14 @@ const DatePost = styled.span`
 function Cards({ post }) {
   const userStorage = JSON.parse(localStorage.getItem('user'))
   let result = false
+  let resultUser = false
   const [countLikes, setCountLikes] = useState(post.Likes.length)
   const [isDataLoading, setDataLoading] = useState(false)
   const [error, setError] = useState(false)
   const [show, setShow] = useState(false)
   const [idPostDelete, setIdPostDelete] = useState()
   const [isLoad, setIsLoad] = useState(0)
-  const [isAdmin, setIsAdmin] = useState(userStorage.admin)
+  const [isAdmin] = useState(userStorage.admin)
 
   const handleClose = () => setShow(false)
   const handleShow = () => setShow(true)
@@ -69,7 +70,13 @@ function Cards({ post }) {
       }
     }
   }
+
   const [checked, setChecked] = useState(result)
+  console.log('post:' + post.UserId, 'user:' + userStorage.userId)
+  if (post.UserId === userStorage.userId) {
+    resultUser = true
+  }
+  const [isUser] = useState(resultUser)
 
   async function likeAction(postId) {
     setError(false)
@@ -193,7 +200,7 @@ function Cards({ post }) {
                     Oups il y a eu un problème
                   </Alert>
                 ) : null}
-                {isAdmin ? (
+                {isAdmin || isUser ? (
                   <CrudAdmin>
                     <Link to={`/myposts/edit/${post.id}`}>
                       <Button variant="secondary">Modification</Button>
