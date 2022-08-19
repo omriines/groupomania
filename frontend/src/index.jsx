@@ -14,11 +14,11 @@ import MyPosts from './pages/MyPosts'
 import Edit from './pages/MyPosts/edit'
 import Create from './pages/MyPosts/create'
 import { UserProvider } from './utils/context/user'
-
 const root = ReactDOM.createRoot(document.getElementById('root'))
 const GlobalStyle = createGlobalStyle`
 * {
-font-family: 'Trebuchet MS', Helvetica, sans-serif;
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
+  font-family: 'Lato', sans-serif;
 }
 body {
 margin: 0;
