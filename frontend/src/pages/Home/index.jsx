@@ -1,9 +1,8 @@
-import Signin from "../Signin"
+import Posts from "../Posts";
 
 function Home() {
-
     return (
-        <Signin />
+        <Posts />
     )
 }
 

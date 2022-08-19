@@ -6,7 +6,7 @@ import Cards from "../../components/Cards";
 import styled from "styled-components";
 
 const CardsContainer = styled.div`
-    margin-top:0px;
+  margin-top: 20px
 `
 const PostsContainer = styled.div`
     margin:0px 20px !important;
@@ -20,7 +20,6 @@ const PageTitle = styled.h1`
 `
 
 function Posts() {
-
 
     const [isDataLoading, setDataLoading] = useState(false)
     const [error, setError] = useState(false)

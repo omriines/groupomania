@@ -26,15 +26,49 @@ exports.addLike =  (req, res, next) => {
                     PostId: req.body.postId,
                   },
                 },
-              );
-              res.status(404).json({ message: "Post disliké !" });
+              ).then(resultDestroy => {
+                if(resultDestroy)
+              {
+                  Like.count({
+                  where: {
+                    PostId: req.body.postId
+                  }}).then(count => {
+                  console.log(count);
+                  return res.status(200).json({ message: 'Post disliké !', countLike: count });
+             
+                }).catch(error => {
+                  return res.status(400).json({ message:  error.message });
+             
+                  });
+                }}
+                 ).catch(error => {
+                  return res.status(500).json({ message:  error.message });
+              });
+
             }
               else {
                 Like.create({
                     UserId: userId,
                     PostId: req.body.postId,
+                  }).then(resultCreate => {
+                    if(resultCreate)
+                  {
+                      Like.count({
+                      where: {
+                        PostId: req.body.postId
+                      }}).then(count => {
+                      console.log(count);
+                      return res.status(200).json({ message: 'Post liké !', countLike: count });
+                 
+                    }).catch(error => {
+                      return res.status(400).json({ message:  error.message });
+                 
+                      });
+                    }}
+                     ).catch(error => {
+                      return res.status(500).json({ message:  error.message });
                   });
-              return res.status(200).json({ message: 'Post liké !' });
+
               } 
     })  .catch(error => res.status(500).json({ message : error.message }));
 }

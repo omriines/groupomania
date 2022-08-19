@@ -20,7 +20,7 @@ const FormEdit = styled.form`
 `
 
 function Edit() {
-    
+
     const { idPost } = useParams()
     const [isDataLoading, setDataLoading] = useState(false)
     const [error, setError] = useState(false)
@@ -34,12 +34,12 @@ function Edit() {
         setInputMessageValue(e.target.value)
     }
     function setInputImage(e){
-        
+
     }
     function handleInputImage(e) {
-       setSelectedFile(URL.createObjectURL(e.target.files[0]));
-          setInputImageValue(e.target.files[0]);
-          
+        setSelectedFile(URL.createObjectURL(e.target.files[0]));
+        setInputImageValue(e.target.files[0]);
+
     }
     useEffect(() => {
 
@@ -58,24 +58,25 @@ function Edit() {
                     mode: 'cors',
                     headers
                 };
-                  const response = await fetch(`http://localhost:3000/api/post/getPostById/`+idPost, options)
+                const response = await fetch(`http://localhost:3000/api/post/getPostById/`+idPost, options)
                 const post = await response.json();
-                    setInputMessageValue(post.message);
-                    setInputImageValue(post.image);
-                    setSelectedFile(post.image);
+                setInputMessageValue(post.message);
+                setInputImageValue(post.image);
+                setSelectedFile(post.image);
+                console.log(post.image)
             } catch (err) {
                 console.log('===== error =====', err)
                 setError(true)
             } finally {
                 setDataLoading(false)
-             }
+            }
         }
         fetchPosts()
     }, [])
 
     async function updatePost() {
 
-           
+
         try {
             const userStorage = JSON.parse(localStorage.getItem("user"))
             const headers = new Headers(
@@ -84,37 +85,37 @@ function Edit() {
                     'Authorization': 'Bearer ' + userStorage.token
                 }
             );
-           
-                const formData = new FormData();
-                formData.append('post', JSON.stringify({
+
+            const formData = new FormData();
+            formData.append('post', JSON.stringify({
                 "id":idPost,
                 "message":inputMessageValue
-                }));
-                formData.append('image', inputImageValue);
-                
-                const options = {
-                    method: 'PUT',
-                    mode: 'cors',
-                    headers,
-                    body: formData
-            
-                    };
-             
+            }));
+            formData.append('image', inputImageValue);
+            console.log(inputImageValue)
+            const options = {
+                method: 'PUT',
+                mode: 'cors',
+                headers,
+                body: formData
+
+            };
+
             const response = await fetch(`http://localhost:3000/api/post/update`, options)
-            const result = await response.formData();
-          
+            if (response.status === 200) {
+                setIsMessage(true)
+            }
+
         } catch (err) {
-            console.log(err);
-            console.log('===== error =====', err.response.data)
+            console.log('===== error =====', err)
             setError(true)
         } finally {
-            
+
         }
     }
-    
+
 
     async function editPost() {
-        setIsMessage(true)
         updatePost();
     }
 
@@ -141,21 +142,18 @@ function Edit() {
                                       onChange={handleInputMessage} />
                     </Form.Group>
                     <img src={selectedFile} alt="" width={50} height={50}/>
-                   
+
                     <Form.Group controlId="formFile" className="mb-3">
                         <Form.Label></Form.Label>
-                        {/* { <Form.Control type="file" value={selectedFile} 
-                          onChange={(e) => setSelectedFile(e.target.files[0])}/> 
-                          } */}
-                           { <Form.Control type="file"  
-                          onChange={handleInputImage}/> 
-                          }
+                        { <Form.Control type="file"
+                                        onChange={handleInputImage}/>
+                        }
                     </Form.Group>
-                    
+
                     <Button variant="primary" onClick={() => editPost()}>
                         Modifier
                     </Button>
-</FormEdit>
+                </FormEdit>
             )}
         </div>
     )
