@@ -33,37 +33,164 @@ console.log("message:"+postObject.message);
 
     };
 
-exports.getAll = (req, res, next) => {
-    console.log("entré dans API");
-    Post.findAll({
-        attributes: [
-          "id",
-          "message",
-          "image",
-          "createdAt",
-          "updatedAt",
-          "UserId",
-        ],
-    
-        order: [["createdAt", "DESC"]],
-        group:["id"],
-    
-        include: [
-          {
-            model : Like,
-            attributes: [ [sequelize.fn('COUNT', sequelize.col('likes.id')), 'count'],
-        ]
-          },
-          {
-            model: User,
-            attributes: ["name", "id"],
-          }
-         
-        ],
+exports.getPostByIdUser = (req, res, next) => {
+  console.log("entré dans API:"+req.params.id);
+  Post.findAll({
+      attributes: [
+        "id",
+        "message",
+        "image",
+        "createdAt",
+        "updatedAt",
+        "UserId",
+      ],
+  
+      order: [["createdAt", "DESC"]],
+      group:["id"],
+  
+      include: [
+        {
+          model : Like,
+          attributes: [ [sequelize.fn('COUNT', sequelize.col('likes.id')), 'count'],
+      ]
+        },
+        {
+          model: User,
+          attributes: ["name", "id"],
+          
+        }
        
+      ],
+      where:{userId: req.params.id}
+    
+    })
+    .then((Posts) => res.status(201).json({Posts}))
+    .catch(error => {
+      console.log(error);
+      res.status(400).json({ message : error.message }); 
+     
+    })
+   
+  };
+//------------------------
+exports.getPostById = (req, res, next) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
+  const userId = decodedToken.userId;
+  const isAdmin = decodedToken.isAdmin;
+  Post.findOne({
+      attributes: [
+        "id",
+        "message",
+        "image",
+        "createdAt",
+        "updatedAt",
+        "UserId",
+      ],
+      where:{UserId: userId,
+        id:req.params.id
+      }
+    })
+    .then((post) => res.status(201).json({
+      id:post.id,
+      UserId: post.UserId,
+      message: post.message,
+      image:post.image,
+    }))
+    .catch(error => {
+      console.log(error);
+      res.status(400).json({ message : error.message }); 
+     
+    })
+   
+  };
+//-----------------
+
+exports.getAll = (req, res, next) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
+  const userId = decodedToken.userId;
+  const isAdmin = decodedToken.isAdmin;
+    console.log("entré dans API");
+    // Post.findAll({
+    //     attributes: [
+    //       "id",
+    //       "message",
+    //       "image",
+    //       "createdAt",
+    //       "updatedAt",
+    //       "userId",
+    //     ],
+    
+    //     order: [["createdAt", "DESC"]],
+    //     group:["id"],
+    
+    //     include: [
+    //       {
+    //         model : Like,
+    //         attributes: [ [sequelize.fn('COUNT', sequelize.col('likes.id')), 'count']]
+    //       },
+    //       {
+    //         model : User,
+    //         attributes: [ "id"]
       
+    //       },
+    //       sequelize.literal(`(
+    //         SELECT id AS LikeUser
+    //         FROM Likes 
+    //         WHERE
+    //             Likes.userId = ${userId}
+    //             AND
+    //             Likes.postId = Posts.id
+    //     )`),
+    //     ],
+    //   }
+    //    )   
+    //   //************* */
+    
+      
+    //   //**************** */
+    Post.findAll({
+      attributes: [
+        "id",
+        "message",
+        "image",
+        "createdAt",
+        "updatedAt",
+        "UserId",
+      ],
+  
+      order: [["createdAt", "DESC"]],
+      group:["id"],
+  
+      include: [
+        {
+          model: User,
+          attributes: ["name", "id"],
+        },
+        {
+                  model : Like,as :'likeCount',
+                  attributes: [ [sequelize.fn('COUNT', sequelize.col('likes.id')), 'count']]
+                },
+        {
+          model: Like,
+          attributes: ["PostId", "UserId"],
+          
+          include: [
+            {
+              model: User,
+              attributes: ["name"],
+              where :{id:userId}
+            },
+          ],
+        },
+      
+       
+      ],
+    })
+   
+      .then((Posts) => {res.status(201).json({Posts})
       })
-      .then((Posts) => res.status(201).json({Posts}))
       .catch(error => {
         console.log(error);
         res.status(400).json({ message : error.message }); 
@@ -72,7 +199,11 @@ exports.getAll = (req, res, next) => {
      
     };
 exports.update = (req, res, next) => {
+  console.log("***********");
+  console.log(req.body.post);
   const postObject=JSON.parse(req.body.post);
+  const postImage=req.body.file;
+  console.log(req.file.filename);
         console.log(postObject.id);
         Post.findOne({
           where: {
@@ -80,7 +211,7 @@ exports.update = (req, res, next) => {
           },
         })
           .then(() => {
-            console.log(`${req.protocol}://${req.get('host')}/images/${req.file.filename}`);
+        //    console.log(`${req.protocol}://${req.get('host')}/images/${req.file.filename}`);
             Post.update(
               {
                 

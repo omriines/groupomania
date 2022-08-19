@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import styled from "styled-components"
 import {Loader} from "../../utils/style/Atoms"
+import {MessageWarning} from "../../utils/style/Atoms"
+import {LoaderWrapper} from "../../utils/style/Atoms"
 import {useNavigate} from 'react-router-dom'
 
 const FormSignin = styled.form`
@@ -12,15 +14,6 @@ const FormSignin = styled.form`
     flex-direction: column;
     align-items: center;
     font-weight: 500;
-`
-const LoaderWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-`
-const MessageWarning = styled.div`
-  color: red;
-  text-align: center;
-  padding: 32px 0 0 0;
 `
 
 function Signup() {
