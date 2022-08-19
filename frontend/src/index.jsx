@@ -31,14 +31,34 @@ margin-bottom:15px
 .margin-top-30 {
 margin-top:30px
 }
-.margin-left-20 {
-margin-left:20px
+.button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.buttonAccueil{
+display:flex;
+flex-direction: row;
+column-gap: 2px;
 }
 
-@media screen and (max-width: 576px) {
-margin-left-20 : 0px !important;
-margin-top 10px !important;
+@media screen and (max-width: 768px) {
+.button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 5px;
 }
+}
+@media (min-width: 769px) and (max-width: 1024px) 
+{
+  .buttonAccueil {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 5px;
+  }
+  }
 
 `
 

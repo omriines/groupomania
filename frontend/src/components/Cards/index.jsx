@@ -201,7 +201,7 @@ function Cards({ post }) {
                   </Alert>
                 ) : null}
                 {isAdmin || isUser ? (
-                  <CrudAdmin>
+                  <CrudAdmin className="buttonAccueil">
                     <Link to={`/myposts/edit/${post.id}`}>
                       <Button variant="secondary">Modification</Button>
                     </Link>
