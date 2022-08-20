@@ -49,6 +49,7 @@ const DatePost = styled.span`
 `
 
 function Cards({ post }) {
+  /*Déclaration  */
   const userStorage = JSON.parse(localStorage.getItem('user'))
   let result = false
   let resultUser = false
@@ -62,7 +63,7 @@ function Cards({ post }) {
 
   const handleClose = () => setShow(false)
   const handleShow = () => setShow(true)
-
+  /*Vérifier si l'utilisateur connecté à liké le  post ou nn */
   if (post.Likes.length !== 0) {
     for (let i = 0; i < post.Likes.length; i++) {
       if (post.Likes[i].UserId === userStorage.userId) {
@@ -72,7 +73,9 @@ function Cards({ post }) {
   }
 
   const [checked, setChecked] = useState(result)
+
   console.log('post:' + post.UserId, 'user:' + userStorage.userId)
+  /*Vérifier si l'utilisateur connecté à crée le post ou nn */
   if (post.UserId === userStorage.userId) {
     resultUser = true
   }

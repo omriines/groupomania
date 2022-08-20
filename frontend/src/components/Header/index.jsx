@@ -30,7 +30,7 @@ function Header() {
   const [isActiveSecond, setIsActiveSecond] = useState(false)
 
   function handleClick(current) {
-    if (current == 'first') {
+    if (current === 'first') {
       setIsActive(true)
       setIsActiveSecond(false)
     } else {
@@ -43,17 +43,18 @@ function Header() {
     const hours = 24
     const now = new Date().getTime()
     const setupTime = localStorage.getItem('setupTime')
+    /*Vérifier si le token à dépasser 24h ou nn */
     if (setupTime === null || now - setupTime > hours * 60 * 60 * 1000) {
       localStorage.clear()
       navigate('/signin')
     }
-    if (user.length != 0) {
+    if (user.length !== 0) {
       setIsToDisplay(true)
     } else {
       setIsToDisplay(false)
     }
   }, [user])
-
+  /*Pour la déconnexion */
   function handleLogout() {
     setIsActive(true)
     setIsActiveSecond(false)
@@ -121,46 +122,6 @@ function Header() {
         </Container>
       </Navbar>
     </NavContainer>
-    /*<NavContainer>
-            {isAuthenticated ? (
-                    <Link to="/">
-                        <HomeLogo src={logo}/>
-                    </Link>
-                ) :
-                (
-                    <Link to="/signin">
-                        <HomeLogo src={logo}/>
-                    </Link>
-                )
-            }
-            {isToDisplay ? (
-                <Menu>
-                    <div>
-                        <StyledLink
-                            to="/"
-                            $isActive={isActive}
-                            onClick={() => handleClick('first')}
-                        >
-                            Accueil
-                        </StyledLink>
-                        <StyledLink
-                            to="/myposts"
-                            $isActive={isActiveSecond}
-                            onClick={() => handleClick('second')}
-                        >
-                            Mes postes
-                        </StyledLink>
-                    </div>
-                    <NavDropdown title={user.name} id="nav-dropdown">
-                        <NavDropdown.Item eventKey="4.1">{user.name}</NavDropdown.Item>
-                        <NavDropdown.Divider/>
-                        <NavDropdown.Item eventKey="4.2" onClick={() => handleLogout()}>
-                            Déconnexion
-                        </NavDropdown.Item>
-                    </NavDropdown>
-                </Menu>
-            ) : null}
-        </NavContainer>*/
   )
 }
 

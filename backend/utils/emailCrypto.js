@@ -2,7 +2,7 @@
 
 // Import du package 'crypto-js'
 const CryptoJS = require("crypto-js");
-
+//DotEnv est un package npm léger qui charge automatiquement les variables d'environnement d'un .envfichier dans l' process.env
 require('dotenv').config();
 
 const encrypt = email => {

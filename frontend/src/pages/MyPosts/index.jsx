@@ -123,7 +123,7 @@ function Posts() {
 
   return (
     <PostsContainer>
-      {message == 'success' ? (
+      {message === 'success' ? (
         <Alert key="success" variant="success">
           Votre poste a été crée avec succès!
         </Alert>

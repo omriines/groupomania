@@ -1,5 +1,5 @@
 import { useState, createContext, useEffect } from 'react'
-
+/** Partager les props entre les composants */
 export const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
