@@ -25,10 +25,7 @@ exports.create = (req, res, next) => {
     if(postImage.includes("http://localhost:3000/images/")){
       postImage=req.body.image
     };
-    // else{
-    //   postImage=`${req.protocol}://${req.get('host')}/images/${'post.jpg'}`
-    // };
-
+  
        console.log("message:"+postObject.message);
        
        Post.create({
@@ -176,6 +173,10 @@ exports.getAll = (req, res, next) => {
      
     };
 exports.update = (req, res, next) => {
+  const token = req.headers.authorization.split(' ')[1];
+  const decodedToken = jwt.verify(token, process.env.JWT_TOKEN_KEY);
+  const userId = decodedToken.userId;
+  const isAdmin = decodedToken.isAdmin;
   console.log("dans update");
   const postObject=JSON.parse(req.body.post);
   let postImage="";
@@ -184,7 +185,8 @@ exports.update = (req, res, next) => {
             id: postObject.id,
           },
         })
-          .then(() => {
+          .then((post) => {
+            if ((isAdmin) ||( post.UserId==userId)){
            if (req.body.image == null){
               postImage=`${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             }else  
@@ -203,6 +205,9 @@ exports.update = (req, res, next) => {
             )
               .then(() => res.status(200).json({ message: "Post mis à jour !" }))
               .catch((error) => res.status(400).json({ message:error.message }));
+            }else {
+              res.status(403).json({ message : "Action non autorisée !" })
+                }
           })
           .catch((error) => res.status(500).json({ message:error.message }));
 };

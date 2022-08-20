@@ -1,4 +1,5 @@
 const express = require('express');
+//Transmettre les demandes prises en charge aux fonctions de contrôleur appropriées
 const router = express.Router();
 const postCtrl = require('../controllers/post');
 const auth = require('../middleware/auth');
